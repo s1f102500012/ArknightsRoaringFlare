@@ -37,6 +37,7 @@ class Move:
     escape: bool = False  # 本招完成后退场，召唤物从下一敌方回合行动
     summon_count: int = 1
     summon_vigor: tuple = (0, 0)  # 召唤物下一次攻击的每段伤害加成，攻击结束消耗。
+    self_vigor: tuple = (0, 0)  # 自身下一次攻击的每段伤害加成，攻击结束消耗。
 
 
 @dataclass(frozen=True)
@@ -171,7 +172,7 @@ def _turn(kinds, mons, vuln, t, asc):
                         next_summon_worlds.append((spawn_prob * q, [*spawn_mons, replace(child, state=state)]))
                 summon_worlds = next_summon_worlds
         acted = replace(m, history=m.history + (m.state,), strength=strength, summoned=summoned,
-                        lead=m.lead + mv.self_lead[asc], vigor=0 if mv.hits else m.vigor, escaped=mv.escape)
+                        lead=m.lead + mv.self_lead[asc], vigor=(0 if mv.hits else m.vigor) + mv.self_vigor[asc], escaped=mv.escape)
         for spawn_prob, spawn_mons in summon_worlds:
             spawn_mons[i] = acted
             world = tuple(spawn_mons)

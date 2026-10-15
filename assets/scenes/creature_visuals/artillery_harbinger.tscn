@@ -11,26 +11,26 @@ unique_name_in_owner = true
 skeleton_data_res = ExtResource("2_skel_data")
 preview_skin = "default"
 preview_animation = "Idle"
-position = Vector2(0, -52.2)
-scale = Vector2(-0.75, 0.75)
+position = Vector2(0, -33.4)
+scale = Vector2(-0.48, 0.48)
 
 [node name="Bounds" type="Control" parent="." owner="."]
 unique_name_in_owner = true
-position = Vector2(-148, -231)
-size = Vector2(296, 231)
+position = Vector2(-94, -148)
+size = Vector2(189, 148)
 
 [node name="IntentPos" type="Marker2D" parent="." owner="."]
 unique_name_in_owner = true
-position = Vector2(0, -276)
+position = Vector2(0, -193)
 
 [node name="CenterPos" type="Marker2D" parent="." owner="."]
 unique_name_in_owner = true
-position = Vector2(0, -116)
+position = Vector2(0, -74)
 
 [node name="OrbPos" type="Marker2D" parent="." owner="."]
 unique_name_in_owner = true
-position = Vector2(0, -162)
+position = Vector2(0, -104)
 
 [node name="TalkPos" type="Marker2D" parent="." owner="."]
 unique_name_in_owner = true
-position = Vector2(74, -196)
+position = Vector2(47, -126)

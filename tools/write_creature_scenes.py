@@ -4,7 +4,7 @@
 
 几何参数都在 SCENES 表里，改完重跑即可。约定照姊妹模组 ArknightsChernobog：
 - PRTS 骨骼面朝右，敌人要面朝左，所以 SpineSprite（Visuals）X 缩放取负；只翻模型，不翻整个生物节点（会连带翻转命中框/UI）。
-- 缩放：全部单位统一 UNIFORM_SCALE（见下），保持原作的相对大小；表里的缩放列只是量 Bounds 时的基准。
+- 缩放：默认 UNIFORM_SCALE，个别单位按 SCENE_SCALE_OVERRIDES 调整；表里的缩放列只是量 Bounds 时的基准。
 - Visuals.position.x 把身体中线挪到 x=0；先兆者是飞行单位，骨架原点贴着机身底，整体上抬（position.y 为负）。
 - Bounds 以 x=0 居中、底边在 y=0（地面）。高取 Idle 身体顶边（tools/measure_idle_bounds.gd 量的包围盒 +
   tools/body_extent.py 排除拖在身后的剑/披风/法杖），宽取身体宽 + 余量；包围盒含武器与特效，偏宽，不直接用。
@@ -39,10 +39,12 @@ SCENES = {
 
 # 统一缩放（照明日方舟原作的相对大小）：原作所有敌人用同一套比例渲染（PRTS 的 SPINEDATA 只有骨骼文件名、没有逐个敌人的缩放），
 # 相对大小就是骨骼本身的大小——黑蛇骨骼和纠察官差不多高（塔露拉在原作里是常人体型），无人机比士兵宽一倍。
-# 所以全部单位统一乘到 UNIFORM_SCALE，不按普通/精英/组长/Boss 分档放大（之前的分档把黑蛇放大成纠察官的 1.5 倍以上、
+# 默认单位乘到 UNIFORM_SCALE，不按普通/精英/组长/Boss 分档放大（之前的分档把黑蛇放大成纠察官的 1.5 倍以上、
 # 无人机比士兵多放大 15%，打乱了原作比例）。上表的缩放是当初量 Bounds 时用的，偏移与 Bounds 按 UNIFORM_SCALE/表内缩放 同比换算。
 # 0.75 是原来普通兵的缩放，纠察官约 263 高（原版邪教徒 250、红宝石劫匪 227–332）。量法与对照表见 docs/spine_import.md「尺寸」。
 UNIFORM_SCALE = 0.75
+HARBINGER_SCALE = UNIFORM_SCALE * 0.8
+SCENE_SCALE_OVERRIDES = {"artillery_harbinger": HARBINGER_SCALE * 0.8, "core_harbinger": HARBINGER_SCALE}
 
 TEMPLATE = """[gd_scene load_steps=3 format=3]
 
@@ -86,8 +88,9 @@ position = Vector2({tx}, {ty})
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for scene, (node, asset_dir, file_name, idle, scale, vx, vy, w, h) in SCENES.items():
-        k = UNIFORM_SCALE / scale
-        scale, vx, vy = UNIFORM_SCALE, round(vx * k, 1), round(vy * k, 1)
+        target_scale = SCENE_SCALE_OVERRIDES.get(scene, UNIFORM_SCALE)
+        k = target_scale / scale
+        scale, vx, vy = target_scale, round(vx * k, 1), round(vy * k, 1)
         w, h = round(w * k), round(h * k)
         text = TEMPLATE.format(
             dir=asset_dir, file=file_name, node=node, idle=idle, scale=scale, vx=vx, vy=vy,
@@ -95,7 +98,7 @@ def main() -> None:
             intent=-(h + 45), center=-round(h / 2), orb=-round(h * 0.7),
             tx=round(w / 4), ty=-round(h * 0.85),
         )
-        (OUT / f"{scene}.tscn").write_text(text)
+        (OUT / f"{scene}.tscn").write_text(text, encoding="utf-8", newline="\n")
         print(f"wrote {scene}.tscn")
 
 

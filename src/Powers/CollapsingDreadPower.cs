@@ -13,7 +13,7 @@ namespace ArknightsRoaringFlare.Powers;
 /// <summary>每次施加独立倒计时；持有者出牌或结束回合时减一，归零结算可被格挡的伤害。</summary>
 public sealed class CollapsingDreadPower : ModPowerTemplate
 {
-	private const int DreadDamage = 33;
+	private const int DreadDamage = 16;
 	private bool _detonated;
 
 	public override PowerAssetProfile AssetProfile => RoaringFlareAssets.PowerIcon("hunter_sovereign_power");

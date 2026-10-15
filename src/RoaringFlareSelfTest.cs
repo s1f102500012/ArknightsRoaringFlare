@@ -1,9 +1,13 @@
 using ArknightsRoaringFlare.Acts;
 using ArknightsRoaringFlare.Encounters;
 using ArknightsRoaringFlare.Monsters;
+using ArknightsRoaringFlare.Powers;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Bindings.MegaSpine;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Logging;
@@ -144,7 +148,7 @@ internal static class RoaringFlareSelfTest
 			int regular = canonical.AllRegularEncounters.Count();
 			int elite = canonical.AllEliteEncounters.Count();
 			int boss = canonical.AllBossEncounters.Count();
-			Require(weak == 4 && regular == 8 && elite == 3 && boss == 1, $"weak={weak} regular={regular} elite={elite} boss={boss}");
+			Require(weak == 3 && regular == 5 && elite == 2 && boss == 1, $"weak={weak} regular={regular} elite={elite} boss={boss}");
 			Require(canonical.AllBossEncounters.Single() is TalulahBoss, canonical.AllBossEncounters.Single().Id.Entry);
 			Require(canonical.BossDiscoveryOrder.SequenceEqual(canonical.AllBossEncounters), "boss discovery order");
 			return $"weak={weak} regular={regular} elite={elite} boss={canonical.AllBossEncounters.Single().Id.Entry}";
@@ -180,7 +184,6 @@ internal static class RoaringFlareSelfTest
 			[
 				(ModelDb.Encounter<PatrolWeak>(), ModelDb.Encounter<HuskVillageSearchNormal>()),
 				(ModelDb.Encounter<RavagersWeak>(), ModelDb.Encounter<RavagerPackNormal>()),
-				(ModelDb.Encounter<ArmoredCasterWeak>(), ModelDb.Encounter<CasterSquadNormal>()),
 			];
 			foreach ((EncounterModel weak, EncounterModel normal) in pairs)
 			{
@@ -451,6 +454,35 @@ internal static class RoaringFlareSelfTest
 			List<string> missing = tracks.Where(track => !Godot.FileAccess.FileExists(track)).ToList();
 			Require(missing.Count == 0, $"missing {string.Join(", ", missing)}");
 			return string.Join(", ", tracks);
+		});
+
+		Check("harbinger flight and landing routes", () =>
+		{
+			Require(HarbingerFlightPower.AmountForMaxHp(159, 50) == 80 && HarbingerFlightPower.AmountForMaxHp(46, 25) == 12
+				&& HarbingerFlightPower.AmountForMaxHp(156, 10) == 16, "flight HP amount rounds up");
+			foreach (HarbingerBase monster in new HarbingerBase[]
+				{ (CoreHarbinger)ModelDb.Monster<CoreHarbinger>().ToMutable(), (ArtilleryHarbinger)ModelDb.Monster<ArtilleryHarbinger>().ToMutable() })
+			{
+				Creature creature = new(monster, CombatSide.Enemy, null);
+				monster.SetUpForCombat();
+				IReadOnlyDictionary<string, MonsterState> states = monster.MoveStateMachine!.States;
+				MonsterState mode = states[HarbingerBase.ModeBranchId];
+				Require(mode.GetNextState(creature, new Rng(1)) == HarbingerBase.RapidFireMoveId, "grounded -> rapid fire");
+				PowerModel flight = ModelDb.Power<HarbingerFlightPower>().ToMutable();
+				flight.ApplyInternal(creature, HarbingerFlightPower.AmountForMaxHp(creature.MaxHp, HarbingerBase.StandardFlightPercent), silent: true);
+				Require(mode.GetNextState(creature, new Rng(1)) == HarbingerBase.FlightBranchId, "flight -> flying branch");
+				flight.RemoveInternal();
+				Require(mode.GetNextState(creature, new Rng(1)) == HarbingerBase.RapidFireMoveId, "flight removed -> grounded");
+				if (monster is CoreHarbinger)
+				{
+					Require(monster.OpeningStateId == HarbingerBase.MarkMoveId, "core opens with mark");
+					Require(((MoveState)states[HarbingerBase.RapidFireMoveId]).FollowUpState?.Id == CoreHarbinger.RepairMoveId, "rapid -> repair");
+					Require(((MoveState)states[CoreHarbinger.RepairMoveId]).FollowUpState?.Id == CoreHarbinger.RestartMoveId, "repair -> restart");
+					Require(((MoveState)states[CoreHarbinger.RestartMoveId]).FollowUpState?.Id == HarbingerBase.ModeBranchId, "restart -> mode");
+				}
+			}
+			Require(ModelDb.Power<ArtilleryMarkPower>().InstanceType == PowerInstanceType.Instanced, "marks need independent timers");
+			return "flight/landing routes; core MARK, RAPID_FIRE -> REPAIR -> RESTART; independent marks";
 		});
 
 		Check("hunter forms", () =>

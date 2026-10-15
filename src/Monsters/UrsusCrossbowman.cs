@@ -18,7 +18,7 @@ public sealed class UrsusCrossbowman : FlareMonster
 	public const string BoltMoveId = "BOLT_MOVE";
 	public const string VolleyMoveId = "VOLLEY_MOVE";
 
-	private const int VolleyHits = 5;
+	private const int VolleyHits = 3;
 	private const int HealingAmount = 9;
 	private const int WindStrength = 1;
 
@@ -53,9 +53,9 @@ public sealed class UrsusCrossbowman : FlareMonster
 
 	public override int MaxInitialHp => ToughValue(73, 70);
 
-	private int BoltDamage => DeadlyValue(12, 11);
+	private int BoltDamage => DeadlyValue(10, 9);
 
-	private int VolleyDamage => DeadlyValue(4, 3);
+	private int VolleyDamage => DeadlyValue(5, 4);
 
 	public override async Task AfterAddedToRoom()
 	{

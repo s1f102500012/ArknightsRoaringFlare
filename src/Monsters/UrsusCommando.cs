@@ -51,7 +51,7 @@ public sealed class UrsusCommando : FlareMonster
 
 	public override int MinInitialHp => ToughValue(94, 91);
 	public override int MaxInitialHp => ToughValue(98, 95);
-	private int CleaveDamage => DeadlyValue(15, 14);
+	private int CleaveDamage => DeadlyValue(14, 12);
 
 	public override async Task AfterAddedToRoom()
 	{

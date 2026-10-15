@@ -60,9 +60,11 @@ MONSTERS = {
     'CommandoCaptain': (('乌萨斯突击者队长', 'Commando Captain'),
                         {'PRESS': ('压阵', 'Press On'), 'CHARGE': ('冲锋', 'Charge'), 'RETREAT': ('撤退', 'Retreat'), 'FALLEN_RETREAT': ('撤退', 'Retreat'), 'FALLEN_WAIT': ('倒地', 'Downed')}),
     'ArtilleryHarbinger': (('帝国炮火先兆者', 'Imperial Artillery Harbinger'),
-                           {'MARK': ('标定', 'Mark Target'), 'BOMBARD': ('炮击', 'Bombard'), 'SCATTER': ('霰弹', 'Scattershot')}),
+                           {'MARK': ('标定', 'Mark Target'), 'DISRUPT': ('干扰', 'Disrupt'), 'BOMBARD': ('炮击', 'Bombard'),
+                            'RELOAD': ('装填', 'Reload'), 'RAPID_FIRE': ('速射', 'Rapid Fire')}),
     'CoreHarbinger': (('帝国炮火中枢先兆者', 'Imperial Core Harbinger'),
-                      {'MARK': ('标定', 'Mark Target'), 'BOMBARD': ('炮击', 'Bombard'), 'RAPID_FIRE': ('速射', 'Rapid Fire')}),
+                      {'MARK': ('标定', 'Mark Target'), 'MAINTAIN': ('维护', 'Maintenance'), 'CALL': ('呼叫', 'Call Reinforcements'),
+                       'RAPID_FIRE': ('速射', 'Rapid Fire'), 'REPAIR': ('自我修复', 'Self-Repair'), 'RESTART': ('重启', 'Restart')}),
     'ImperialVanguard': (('帝国前锋精锐', 'Imperial Vanguard'),
                          {'LONG_SHOT': ('远射', 'Long Shot'), 'THRUST': ('突刺', 'Thrust'), 'RESOLVE': ('战意', 'Resolve')}),
     'VanguardVeteran': (('帝国前锋百战精锐', 'Imperial Vanguard Veteran'),
@@ -236,12 +238,18 @@ POWERS = {
         'Whenever you play a card or end your turn, reduce this by 1.\nWhen it reaches 0, take [blue]{Damage}[/blue] damage.',
         '你每打出[blue]1[/blue]张牌或者结束你的回合时，层数减[blue]1[/blue]。\n层数归零时，将要受到[blue]{Damage}[/blue]点伤害。',
         'Whenever you play a card or end your turn, reduce this by 1.\nWhen it reaches 0, take [blue]{Damage}[/blue] damage.'),
+    'HarbingerFlightPower': (
+        '飞行', 'Flight',
+        '当{OwnerName}再失去[blue]{Amount}[/blue]点生命值后，失去飞行并被击晕1回合。',
+        'After {OwnerName} loses another [blue]{Amount}[/blue] HP, it loses Flight and is Stunned for 1 turn.',
+        '当{OwnerName}再失去[blue]{Amount}[/blue]点生命值后，失去飞行并被击晕1回合。',
+        'After {OwnerName} loses another [blue]{Amount}[/blue] HP, it loses Flight and is Stunned for 1 turn.'),
     'ArtilleryMarkPower': (
-        '弹着点', 'Artillery Mark',
-        '下个敌方回合，炮弹会对你造成伤害；即使先兆者已被击败，炮弹也会落地。',
-        'Next enemy turn, a shell lands on you. It lands even if the Harbinger has been defeated.',
-        '下个敌方回合，炮弹会对你造成[blue]{Amount}[/blue]点伤害；即使先兆者已被击败，炮弹也会落地。',
-        'Next enemy turn, a shell deals [blue]{Amount}[/blue] damage to you. It lands even if the Harbinger has been defeated.'),
+        '着弹点', 'Artillery Mark',
+        '下个敌方回合结束时，炮弹会对你造成[blue]{Amount}[/blue]点伤害；即使先兆者已被击败，炮弹也会落地。每次标定独立计时。',
+        'At the end of the next enemy turn, a shell deals [blue]{Amount}[/blue] damage to you, even if the Harbinger has been defeated. Each mark has its own timer.',
+        '下个敌方回合结束时，炮弹会对你造成[blue]{Amount}[/blue]点伤害；即使先兆者已被击败，炮弹也会落地。每次标定独立计时。',
+        'At the end of the next enemy turn, a shell deals [blue]{Amount}[/blue] damage to you, even if the Harbinger has been defeated. Each mark has its own timer.'),
     'BattleHardenedPower': (
         '身经百战', 'Battle Hardened',
         '每回合受到的所有未被格挡伤害都延迟至自身回合结束时结算。',
@@ -308,7 +316,7 @@ AFFLICTIONS = {
 def write(lang: str, table: str, data: dict) -> None:
     path = ROOT / lang / f'{table}.json'
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
 
 
 for i, lang in enumerate(('zhs', 'eng')):

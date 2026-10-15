@@ -9,7 +9,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace ArknightsRoaringFlare.Powers;
 
 /// <summary>
-/// 弹着点（挂在玩家身上，层数 = 炮弹伤害）：炮火先兆者“标定”时挂上，下一个敌方回合由先兆者的“炮击”结算并移除。
+/// 着弹点（挂在玩家身上，层数 = 炮弹伤害）：各次标定独立计时，下一个敌方回合结束时结算并移除。
 /// PRTS：先兆者的普攻是向目标位置发射、3 秒后落地的弹道，使用缓存攻击力，发射者死了炮弹照样落地。
 /// 所以先兆者在这期间被击杀时，炮弹在下一个敌方回合结束时由本能力自己落地（能被格挡）。挂上的那个敌方回合结束时不落地。
 /// </summary>
@@ -25,6 +25,8 @@ public sealed class ArtilleryMarkPower : ModPowerTemplate
 	public override PowerType Type => PowerType.Debuff;
 
 	public override PowerStackType StackType => PowerStackType.Counter;
+
+	public override PowerInstanceType InstanceType => PowerInstanceType.Instanced;
 
 	protected override object InitInternalData()
 	{

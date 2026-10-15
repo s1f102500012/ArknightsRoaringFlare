@@ -36,27 +36,23 @@ public static class ModEntry
 		Log.Info($"[{ModId}] Loaded; registered {nameof(RoaringFlareAct)} as an act-index {RoaringFlareAct.ActIndex} variant through RitsuLib (ActLikeIt2 act choice is optional).");
 	}
 
-	// 战斗池只往末尾追加、不重排不改名：类名经 RitsuLib 得出模型 id（ARKNIGHTS_ROARING_FLARE_<类别>_<类名>），存档按 id 引用。
+	// 当前战斗池只保留本地重做的遭遇，旧遭遇定义不再按幕注册；保留项的相对顺序和类名不变。
+	// 类名经 RitsuLib 得出模型 id（ARKNIGHTS_ROARING_FLARE_<类别>_<类名>），存档按 id 引用。
 
 	/// <summary>本幕战斗池（弱怪、普通、精英、Boss），经 RitsuLib 按幕注册；原版的 AllBossEncounters 从中按房间类型筛出 Boss。</summary>
 	internal static readonly Type[] ActEncounterTypes =
 	[
 		typeof(PatrolWeak),
 		typeof(RavagersWeak),
-		typeof(ArmoredCasterWeak),
 		typeof(HuskVillageSearchNormal),
 		typeof(RavagerPackNormal),
-		typeof(CrossbowmenNormal),
 		typeof(CasterSquadNormal),
-		typeof(CommandoSquadNormal),
-		typeof(GuidedArtilleryNormal),
 		typeof(SilentButcherNormal),
-		typeof(HostCenturionNormal),
 		typeof(CommandoCaptainNormal),
 		typeof(EmperorsBladeElite),
 		typeof(VanguardVeteranElite),
-		typeof(CoreHarbingerElite),
 		typeof(TalulahBoss),
+		typeof(GuidedArtilleryNormal),
 	];
 
 	/// <summary>全部敌人与本模组能力：按类型全集注册（顺序不影响 id）。</summary>
